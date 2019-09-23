@@ -19,7 +19,7 @@ from sklearn.metrics import roc_auc_score
 
 
 #Loading dataset from desktop
-dataset = 'C:\\Users\\awindmon\\Desktop\\DATASETS\\TEST_BEFORE_AFTER_COUGH_4416_CUT_TEST3_MFCC_ONLY.csv'
+dataset = 'C:\\TEST_BEFORE_AFTER_COUGH_4416_CUT_TEST3_MFCC_ONLY.csv' #You may have to change this path
 raw_data = open(dataset, 'r')
 
 #Reading shape of dataset
@@ -30,7 +30,7 @@ shape = data.shape
 print(data.shape) #prints out number of samples, and number of features
 
 #Reading shape and target of dataset
-df = pd.read_csv('C:\\Users\\awindmon\\Desktop\\DATASETS\\TEST_BEFORE_AFTER_COUGH_4416_CUT_TEST3_MFCC_ONLY.csv')
+df = pd.read_csv('C:\\TEST_BEFORE_AFTER_COUGH_4416_CUT_TEST3_MFCC_ONLY.csv') #You may have to change this path
 print(df.head())
 #shape = df.shape
 target = df['Class'] #uses the dataframe to single out the 'class' column as the target
