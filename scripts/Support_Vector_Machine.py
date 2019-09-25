@@ -20,7 +20,7 @@ import scikitplot as skplt
 
 
 #Loading dataset from desktop
-dataset = 'C:\\TEST_BEFORE_AFTER_BREATH_4416_TEST4_MFCC_ONLY.csv' #You may have to change this path
+dataset = 'C:\\Users\\awindmon\\Desktop\\DATASETS\\TEST_BEFORE_AFTER_COUGH_4416_CUT_TEST4_MFCC_ONLY.csv'
 raw_data = open(dataset, 'r')
 
 #Reading shape of dataset
@@ -31,11 +31,18 @@ shape = data.shape
 print(data.shape) #prints out number of samples, and number of features
 
 #Creates dataframe for csv
-df = pd.read_csv('C:\\TEST_BEFORE_AFTER_BREATH_4416_TEST4_MFCC_ONLY.csv') #You may have to change this path
+df = pd.read_csv('C:\\Users\\awindmon\\Desktop\\DATASETS\\TEST_BEFORE_AFTER_COUGH_4416_CUT_TEST4_MFCC_ONLY.csv')
 print(df.head())
 target = df['Class'] #uses the dataframe to single out the 'class' column as the target
 
-X_train, X_test, y_train, y_test = train_test_split(df.drop(columns=['Class']), target, test_size=0.4)
+#changes target to binary values
+binary_labels = []
+for class_label in target:
+    new_class_label = 0 if class_label == 'BEFORE_COUGH' else 1
+    binary_labels.append(new_class_label)
+print(binary_labels)
+
+X_train, X_test, y_train, y_test = train_test_split(df.drop(columns=['Class']), binary_labels, test_size=0.4)
 print('--------------------------TRAINING AND TESTING INFO-----------------------------------')
 print("The length of the training set =", len(X_train)) #training sample
 print("The length of the testing set =", len(X_test)) #testing sample
@@ -46,6 +53,7 @@ scores = model.score(X_test, y_test)
 print('------------------------BASIC METRICS---------------------------')
 print("Accuracy =", scores)
 
+
 #Confusion Matrix
 y_predicted = model.predict(X_test)
 #print('y_predicted =', y_predicted)
@@ -53,7 +61,7 @@ confuse_matrix = confusion_matrix(y_test, y_predicted)
 print("Confusion Matrix: \n", confuse_matrix)
 
 #10-Fold Cross Validation
-cv_scores = cross_val_score(model, df.drop(columns=['Class']), target, cv=10)
+cv_scores = cross_val_score(model, df.drop(columns=['Class']), binary_labels, cv=10)
 print("10-Fold scores = ", cv_scores)
 print("Avg. Accuracy (of 10-FCV) = %0.2f (+/- %0.2f)"% (cv_scores.mean(), cv_scores.std()*2))
 
@@ -63,7 +71,7 @@ for train, test in kf.split(df):
     #print('training = %s, testing = %s' %(train,test))
     train_data = numpy.array(df)[train]
     test_data = numpy.array(df)[test]
-    kf_score = cross_val_score(model, df.drop(columns=['Class']), target, cv=kf)
+    kf_score = cross_val_score(model, df.drop(columns=['Class']), binary_labels, cv=kf)
 print('K-Fold Scores =', kf_score)
 print('Avg. K-Fold Scores =', kf_score.mean())
 
@@ -71,7 +79,7 @@ print('Avg. K-Fold Scores =', kf_score.mean())
 skf = StratifiedKFold(n_splits=7, shuffle=True)
 for train, test in skf.split(df, target):
     #print('training = %s, testing = %s' %(train,test))
-    skf_score = cross_val_score(model, df.drop(columns=['Class']), target, cv=skf)
+    skf_score = cross_val_score(model, df.drop(columns=['Class']), binary_labels, cv=skf)
 print('Stratified K-Fold Scores =', skf_score)
 print('Avg. Stratisfied K-Fold Scores =', skf_score.mean())
 #precision, recall & f-measure
@@ -108,7 +116,7 @@ print('false negative rate =', fn_rate)
 
 #Paramter Tuning using cross_val_score
 print('-------------------------PARAMETER TUNING-------------------------------')
-X_train, X_test, y_train, y_test = train_test_split(df.drop(columns=['Class']), target, test_size=0.4)
+X_train, X_test, y_train, y_test = train_test_split(df.drop(columns=['Class']), binary_labels, test_size=0.4)
 print("The length of the training set =", len(X_train)) #training sample
 print("The length of the testing set =", len(X_test)) #testing sample
 
@@ -124,7 +132,7 @@ print("Accuracy 2: =", scores_two)
 print('-----')
 
 #10-Fold Test 2
-cv_scores = cross_val_score(model_two, df.drop(columns=['Class']), target, cv=10)
+cv_scores = cross_val_score(model_two, df.drop(columns=['Class']), binary_labels, cv=10)
 print("Avg. Accuracy (of 10-FCV) = %0.2f (+/- %0.2f)"% (cv_scores.mean(), cv_scores.std()*2))
 print('-----')
 
@@ -135,7 +143,7 @@ for train, test in kf.split(df):
     #print('training = %s, testing = %s' %(train,test))
     train_data = numpy.array(df)[train]
     test_data = numpy.array(df)[test]
-    kf_score_two = cross_val_score(model_two, df.drop(columns=['Class']), target, cv=kf)
+    kf_score_two = cross_val_score(model_two, df.drop(columns=['Class']), binary_labels, cv=kf)
 print('Avg. K-Fold Scores (first) =', kf_score.mean())
 print('Avg. K-Fold Scores (second) =', kf_score_two.mean())
 print('-----')
@@ -145,7 +153,7 @@ print('-----')
 skf = StratifiedKFold(n_splits=6, shuffle=True)
 for train, test in skf.split(df, target):
     #print('training = %s, testing = %s' %(train,test))
-    skf_score_two = cross_val_score(model_two, df.drop(columns=['Class']), target, cv=skf)
+    skf_score_two = cross_val_score(model_two, df.drop(columns=['Class']), binary_labels, cv=skf)
 print('Avg. Stratisfied K-Fold Scores (first) =', skf_score.mean())
 print('Avg. Stratisfied K-Fold Scores (second) =', skf_score_two.mean())
 
@@ -196,6 +204,20 @@ ax.xaxis.set_ticklabels(['Before Breath', 'After Breath'], fontsize=20, horizont
 ax.yaxis.set_ticklabels(['Before Breath', 'After Breath'], fontsize=20, verticalalignment='center')
 plt.show()
 
+#AUC & ROC
+print('------------AUC/ROC--------------')
+y_pred_proba = model.predict_proba(X_test)[::,1]
+fpr, tpr, threshold = metrics.roc_curve(y_test, y_pred_proba, pos_label=1)
+auc = metrics.roc_auc_score(y_test, y_pred_proba)
+print('AUC =', auc)
+lw = 2
+plt.plot([0, 1], [0, 1], color='red', lw=lw, linestyle='--')
+plt.title('ROC of Before & After Breath Using Support Vector Machine')
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.plot(fpr,tpr,label='auc='+str(auc))
+plt.legend(loc=4)
+plt.show()
 
 #plt.figure()
 #sn.heatmap(confuse_matrix, fmt="d", annot=True)
