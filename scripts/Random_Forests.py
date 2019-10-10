@@ -260,3 +260,12 @@ plt.xlabel('False Positive Rate')
 plt.ylabel('True Positive Rate')
 plt.legend(loc=4)
 plt.show()
+
+#visualize tree
+#extracts one tree
+estimator = model.estimators_[5]
+export_graphviz(estimator, out_file='tree.dot', feature_names=feature_names,
+                    class_names=target, rounded=True, proportion = False, precision=2, filled=True)
+call(['dot', '-Tpng', 'tree.dot', '-o', 'tree.png', 'Gdpi=600'])
+Image(filename='tree.png')
+
